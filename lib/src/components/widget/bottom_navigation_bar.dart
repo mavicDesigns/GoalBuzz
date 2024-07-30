@@ -1,55 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:truck/assets/fonts/MavicIcons/mavic_i_cons_icons.dart';
 
 enum NavigationBarType { icons, text, both }
 
 class BottomNavigationBarComponent extends StatelessWidget {
   final int currentIndex;
-  final List<String> items;
-  final List<IconData>? icons;
-  final NavigationBarType navigationBarType;
   final ValueChanged<int>? onTap;
 
   const BottomNavigationBarComponent({
-    Key? key,
+    super.key,
     required this.currentIndex,
-    required this.items,
-    this.icons,
-    this.navigationBarType = NavigationBarType.both,
     this.onTap,
-  })  : assert(navigationBarType != NavigationBarType.icons || icons != null, 
-               'Icons must be provided if navigationBarType is icons'),
-        assert(navigationBarType != NavigationBarType.text || icons == null, 
-               'Icons should be null if navigationBarType is text'),
-        assert(icons == null || icons.length == items.length, 
-               'Icons length must be equal to items length'),
-        super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final selectedColor = theme.colorScheme.tertiary;
-    final unselectedColor = Colors.grey;
+    return Container(
+      height: 70,
+      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [],
+          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildNavItem(MavicICons.planet, 0, context),
+          _buildNavItem(MavicICons.calendar_week, 1, context),
+          _buildNavItem(MavicICons.phone, 2, context),
+          _buildNavItem(MavicICons.user_02, 3, context),
+        ],
+      ),
+    );
+  }
 
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
-      items: List.generate(items.length, (index) {
-        final icon = icons?[index] ?? Icons.circle;
-        return BottomNavigationBarItem(
-          icon: navigationBarType == NavigationBarType.text
-              ? SizedBox.shrink()
-              : Icon(icon, color: index == currentIndex ? selectedColor : unselectedColor),
-          label: navigationBarType == NavigationBarType.icons
-              ? ''
-              : items[index], // Provide label only if not using icons
-          activeIcon: navigationBarType == NavigationBarType.text
-              ? null
-              : Icon(icon, color: selectedColor),
-        );
-      }),
-      selectedItemColor: selectedColor,
-      unselectedItemColor: unselectedColor,
-      type: BottomNavigationBarType.fixed,
+  Widget _buildNavItem(IconData icon, int index, BuildContext context) {
+    final bool isSelected = currentIndex == index;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+          color:
+              isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(30)),
+      child: IconButton(
+        onPressed: () => onTap!(index),
+        color: Theme.of(context).textTheme.bodyMedium!.color,
+        icon: Icon(icon, size: 26),
+      ),
     );
   }
 }

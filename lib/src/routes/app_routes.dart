@@ -6,7 +6,6 @@ import 'package:truck/src/screens/form_Screen.dart';
 import 'package:truck/src/screens/main_screen.dart';
 import 'package:truck/src/screens/select_button_screen.dart';
 import 'package:truck/src/screens/splash_screen.dart';
-import '../screens/pageview/home_screen.dart';
 import '../screens/login_screen.dart';
 
 class AppRoutes {
