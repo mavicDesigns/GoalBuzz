@@ -30,10 +30,11 @@ final ThemeData lightTheme = ThemeData(
     ),
     scaffoldBackgroundColor: AppColors.text4,
     appBarTheme: AppBarTheme(
+          surfaceTintColor: Colors.white,
       backgroundColor: AppColors.cardColor,
       foregroundColor: AppColors.text4,
       iconTheme: IconThemeData(
-        color: AppColors.text4,
+        color: AppColors.text3,
       ),
       titleTextStyle: TextStyle(
         fontFamily: 'Urbanist',
