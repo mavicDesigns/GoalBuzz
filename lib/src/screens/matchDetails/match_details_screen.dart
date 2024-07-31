@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:truck/assets/fonts/MavicIcons/mavic_i_cons_icons.dart';
+import 'package:truck/src/screens/matchDetails/pageviews/details_page_screen.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
   const MatchDetailsScreen({super.key});
@@ -8,8 +9,11 @@ class MatchDetailsScreen extends StatefulWidget {
   State<MatchDetailsScreen> createState() => _MatchDetailsScreenState();
 }
 
-class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
+class _MatchDetailsScreenState extends State<MatchDetailsScreen>
+    with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
+  late TabController _tabController;
+
   bool isExpanded = true;
   final collapsedBarHeight = 60.0;
   final expandedBarHeight = 200.0;
@@ -18,10 +22,13 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
   double _imageScale = 1.0;
   double _translateX = 0; // Initial value
 
+  final List<String> pageViewNavs = ["Details", "Lineup", "Stats", "H2H"];
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _tabController = TabController(vsync: this, length: pageViewNavs.length);
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       double offset = _scrollController.offset;
@@ -29,7 +36,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           expandedBarHeight - 150; // Maximum scroll offset for the SliverAppBar
 
       double initialTranslateX = 0; // Translation value when expanded
-      double finalTranslateX = 50; // Translation value when collapsed
+      double finalTranslateX = 70; // Translation value when collapsed
 
       setState(() {
         _textOpacity = ((maxOffset - offset) / maxOffset).clamp(0.0, 1.0);
@@ -41,72 +48,84 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
     });
   }
 
+  List<Widget> _buildPageNav() {
+    return List.generate(pageViewNavs.length, (index) {
+      return Container(
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Text(
+          pageViewNavs[index],
+          style: TextStyle(
+              fontSize: 12,
+              fontFamily: Theme.of(context).textTheme.bodyLarge!.fontFamily,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.bodySmall!.color!),
+        ),
+      );
+    });
+  }
+
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      expandedHeight: expandedBarHeight,
+      pinned: true,
+      forceElevated: true,
+      shadowColor: Theme.of(context).cardTheme.color!.withOpacity(.5),
+      actionsIconTheme: IconThemeData(
+        opacity: _textOpacity,
+      ),
+      backgroundColor: Theme.of(context).cardTheme.color,
+      collapsedHeight: collapsedBarHeight,
+      flexibleSpace: AnimatedBuilder(
+        animation: _scrollController,
+        builder: (context, child) {
+          return _buildFinishedScoreBar();
+        },
+      ),
+      actions: [
+        IconButton(
+            onPressed: () => {},
+            icon: Icon(
+              MavicICons.share_ios_export,
+            )),
+        IconButton(
+            onPressed: () => {}, icon: Icon(MavicICons.bell_notification)),
+        IconButton(onPressed: () => {}, icon: Icon(MavicICons.star))
+      ],
+      bottom: PreferredSize(
+          preferredSize: Size.fromHeight(50),
+          child: TabBar(
+            onTap: (value) {
+               _tabController.animateTo(value);
+            },
+            tabAlignment: TabAlignment.start,
+            controller: _tabController,
+            dividerColor: Theme.of(context).cardTheme.color,
+            isScrollable: true,
+            tabs: _buildPageNav(),
+          )),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).cardColor,
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          SliverAppBar(
-            expandedHeight: expandedBarHeight,
-            pinned: true,
-            actionsIconTheme: IconThemeData(
-              opacity: _textOpacity,
-            ),
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            collapsedHeight: collapsedBarHeight,
-            flexibleSpace: AnimatedBuilder(
-              animation: _scrollController,
-              builder: (context, child) {
-                return _buildFinishedScoreBar();
-              },
-            ),
-            actions: [
-              IconButton(
-                  onPressed: () => {},
-                  icon: Icon(
-                    MavicICons.share_ios_export,
-                  )),
-              IconButton(
-                  onPressed: () => {},
-                  icon: Icon(MavicICons.bell_notification)),
-              IconButton(onPressed: () => {}, icon: Icon(MavicICons.star))
+        body: NestedScrollView(
+          controller: _scrollController,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              _buildAppBar(),
+            ];
+          },
+          body: TabBarView(
+            controller: _tabController,
+            children: <Widget>[
+              DetailsPageView(),
+              DetailsPageView(),
+              DetailsPageView(),
+              DetailsPageView(),
             ],
-            bottom: PreferredSize(
-              preferredSize: Size.fromHeight(50),
-              child: Container(
-                child: Row(
-                  children: [
-                    Text('data'),
-                    Text('data'),
-                    Text('data'),
-                    Text('data'),
-                  ],
-                ),
-              ),
-            ),
           ),
-          SliverGrid(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Container(
-                  alignment: Alignment.center,
-                  color: Colors.teal[70],
-                  child: Text('grid item $index'),
-                );
-              },
-            ),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 15,
-              crossAxisSpacing: 15,
-              childAspectRatio: 2.0,
-            ),
-          )
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildFinishedScoreBar() {
@@ -159,56 +178,26 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 10,
+                    height: 20,
                   ),
                   Text(''),
                   Transform.scale(
                     scale: _imageScale,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '0',
-                          style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .displayLarge!
-                                  .color),
-                        ),
-                        SizedBox(
-                          width: 50,
-                          child: Text(
-                            '-',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .displayLarge!
-                                    .color),
-                          ),
-                        ),
-                        Text(
-                          '2',
-                          style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context)
-                                  .textTheme
-                                  .displayLarge!
-                                  .color),
-                        ),
-                      ],
+                    child: Text(
+                      '0 - 2',
+                      style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color:
+                              Theme.of(context).textTheme.displayLarge!.color),
                     ),
                   ),
                   Opacity(
                     opacity: _textOpacity,
                     child: Text(
-                      'Delayed',
+                      'AP',
                       style: TextStyle(
+                          fontSize: 13,
                           color: Theme.of(context).textTheme.bodyLarge!.color),
                     ),
                   ),
@@ -257,7 +246,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen> {
           ],
         ));
   }
-
-
-
 }
+
+
+

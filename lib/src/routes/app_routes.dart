@@ -4,7 +4,7 @@ import 'package:truck/src/screens/dialog_screen.dart';
 import 'package:truck/src/screens/dropdown_screen.dart';
 import 'package:truck/src/screens/form_Screen.dart';
 import 'package:truck/src/screens/main_screen.dart';
-import 'package:truck/src/screens/match_details_screen.dart';
+import 'package:truck/src/screens/matchDetails/match_details_screen.dart';
 import 'package:truck/src/screens/select_button_screen.dart';
 import 'package:truck/src/screens/splash_screen.dart';
 import '../screens/login_screen.dart';

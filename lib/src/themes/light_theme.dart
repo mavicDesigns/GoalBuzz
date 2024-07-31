@@ -171,9 +171,13 @@ final ThemeData lightTheme = ThemeData(
       hintStyle: TextStyle(color: AppColors.text3),
     ),
     iconTheme: IconThemeData(
-      color: AppColors.primary1,
+      color: AppColors.text3,
     ),
      bottomNavigationBarTheme:
         BottomNavigationBarThemeData(backgroundColor: AppColors.cardColor),
     bottomAppBarTheme:
-        BottomAppBarTheme(color: Colors.transparent));
+        BottomAppBarTheme(color: Colors.transparent)
+    
+        
+        
+        );
