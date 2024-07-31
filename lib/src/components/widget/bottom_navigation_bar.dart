@@ -17,12 +17,12 @@ class BottomNavigationBarComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 70,
-      margin: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+      margin: EdgeInsets.only(bottom: 30, right: 20, left: 20),
       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [],
-          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor),
+          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor
+          ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

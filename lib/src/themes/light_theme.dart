@@ -30,7 +30,7 @@ final ThemeData lightTheme = ThemeData(
     ),
     scaffoldBackgroundColor: AppColors.text4,
     appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.primary1,
+      backgroundColor: AppColors.cardColor,
       foregroundColor: AppColors.text4,
       iconTheme: IconThemeData(
         color: AppColors.text4,

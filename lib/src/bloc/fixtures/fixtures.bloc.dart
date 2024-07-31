@@ -1,0 +1,19 @@
+// matches_bloc.dart
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
+import 'package:truck/src/services/api/api_service.dart';
+
+class FixturesBloc extends Bloc<FixtureEvent, FixturesState> {
+  FixturesBloc() : super(FixtureInitial()) {
+    on<FetchFixtures>((event, emit) async {
+      emit(FixturesLoading());
+      try {
+        // Fetch topic details from repository
+        final fixtureResponse = await fetchFixturesFromNetwork(event.date);
+        emit(FixturesLoaded(fixtureResponse));
+      } catch (e) {
+        emit(FixturesError('Failed to fetch topic details: $e'));
+      }
+    });
+  }
+}

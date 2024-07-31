@@ -29,7 +29,7 @@ final ThemeData darkTheme = ThemeData(
   ),
   scaffoldBackgroundColor: AppColors.background,
   appBarTheme: AppBarTheme(
-    backgroundColor: AppColors.primary1,
+    backgroundColor: AppColors.cardColor,
     foregroundColor: AppColors.text1,
     iconTheme: IconThemeData(
       color: AppColors.text1,

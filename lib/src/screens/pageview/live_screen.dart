@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For formatting dates
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:truck/src/bloc/fixtures/fixtures.bloc.dart';
+import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
+import 'package:truck/src/components/widget/custom_button.dart';
+import 'package:truck/src/models/api_response_model.dart';
+import 'package:truck/src/models/fixture_model.dart';
 
 class LiveMatchesScreen extends StatefulWidget {
   @override
@@ -8,13 +14,14 @@ class LiveMatchesScreen extends StatefulWidget {
 
 class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
   final PageController _pageController = PageController(initialPage: 6);
-  final Map<String, _CachedData<List<Match>>> _cache = {};
-  final Duration _cacheDuration = Duration(minutes: 10);
   final ScrollController _scrollController = ScrollController();
-
   List<DateTime> _dates = List.generate(
-      14, (index) => DateTime.now().subtract(Duration(days: 6 - index)));
+      14,
+      (index) => DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day)
+          .subtract(Duration(days: 6 - index)));
   int _currentIndex = 6;
+  bool poppupIsActive = false;
 
   @override
   void initState() {
@@ -30,7 +37,6 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
       _currentIndex = _pageController.page?.round() ?? 6;
     });
 
-    // Add more dates to the end
     if (_pageController.page! >= _dates.length - 1) {
       setState(() {
         _dates.addAll(List.generate(
@@ -38,7 +44,6 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
       });
     }
 
-    // Add more dates to the beginning
     if (_pageController.page! <= 0) {
       setState(() {
         _dates.insertAll(
@@ -48,15 +53,30 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
         _pageController.jumpToPage(7);
       });
     }
+
     _scrollToCenter(_currentIndex);
+
+    if (poppupIsActive && _currentIndex - 6 <= 5) {
+      setState(() {
+        poppupIsActive = false;
+      });
+    }
+
+    if (!poppupIsActive && (_currentIndex - 6 > 5)) {
+      setState(() {
+        poppupIsActive = true;
+      });
+    }
   }
 
   void _scrollToCenter(int index) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       double screenWidth = MediaQuery.of(context).size.width;
-      double containerWidth = screenWidth / 4; // Adjust this value as needed
-      double scrollPosition = containerWidth * index -
-          (screenWidth / 2 - containerWidth / 2);
+      double containerWidth = screenWidth / 4;
+
+      double scrollPosition =
+          containerWidth * index - (screenWidth / 2 - containerWidth / 2);
+
       _scrollController.animateTo(
         scrollPosition,
         duration: Duration(milliseconds: 300),
@@ -65,32 +85,87 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     });
   }
 
+  void _showReturnToTodayDialog() {
+    setState(() {
+      poppupIsActive = true;
+    });
+  }
+
+  void returnToToday() {
+    int todayIndex = _dates.indexWhere((date) =>
+        date ==
+        DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day));
+    _pageController.jumpToPage(todayIndex);
+  }
+
   @override
   void dispose() {
     _pageController.removeListener(_pageListener);
     _pageController.dispose();
     _scrollController.dispose();
+    _fixturesBloc.close();
     super.dispose();
   }
 
+  final Map<DateTime, ApiResponse> _cache = {};
+  late FixturesBloc _fixturesBloc;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Live Matches'),
-        centerTitle: false,
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(50),
-          child: _buildDateNav(),
+    return BlocProvider(
+      create: (context) => FixturesBloc(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Live Matches',
+            style:
+                TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color!),
+          ),
+          centerTitle: false,
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(50),
+            child: _buildDateNav(),
+          ),
         ),
-      ),
-      body: PageView.builder(
-        controller: _pageController,
-        itemCount: _dates.length,
-        itemBuilder: (context, index) {
-          DateTime date = _dates[index];
-          return _buildMatchDayPage(date);
-        },
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            PageView.builder(
+              controller: _pageController,
+              itemCount: _dates.length,
+              itemBuilder: (context, index) {
+                DateTime date = _dates[index];
+                return Container(
+                  margin: EdgeInsets.symmetric(vertical: 20),
+                  padding: const EdgeInsets.all(8.0),
+                  child: _buildMatchDayPage(date),
+                );
+              },
+            ),
+            AnimatedPositioned(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.fastOutSlowIn,
+                bottom: poppupIsActive ? 0 : -50,
+                child: AnimatedOpacity(
+                  duration: Duration(milliseconds: 300),
+                  opacity: poppupIsActive ? 1 : 0,
+                  curve: Curves.fastOutSlowIn,
+                  child: SizedBox(
+                    height: 50,
+                    child: CustomButton(
+                        text: 'Today',
+                        buttonType: ButtonType.elevated,
+                        onPressed: () {
+                          setState(() {
+                            poppupIsActive = false;
+                          });
+                          returnToToday();
+                        }),
+                  ),
+                )),
+          ],
+        ),
       ),
     );
   }
@@ -109,11 +184,15 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
       child: Row(
         children: List.generate(_dates.length, (index) {
           DateTime date = _dates[index];
-          String formattedDate = calculateDifference(date) == 0
-              ? 'Today'
-              : calculateDifference(date) == -1 ? 'Yesterday'
-              : calculateDifference(date) == 1 ? 'Tomorrow'
-              : DateFormat('MMM d').format(date);
+          String formattedDate = DateFormat('MMM d').format(date);
+          if (calculateDifference(date) == 0) {
+            formattedDate = 'Today';
+          } else if (calculateDifference(date) == -1) {
+            formattedDate = 'Yesterday';
+          } else if (calculateDifference(date) == 1) {
+            formattedDate = 'Tomorrow';
+          }
+
           return InkWell(
             onTap: () {
               _pageController.jumpToPage(index);
@@ -123,14 +202,17 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
               decoration: BoxDecoration(
                   border: Border(
                       bottom: BorderSide(
-                        width: 5,
+                          width: 5,
                           color: index == _currentIndex
-                              ?  Theme.of(context).cardColor
+                              ? Theme.of(context).textTheme.bodySmall!.color!
                               : Colors.transparent))),
               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Text(
                 formattedDate,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).cardColor),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).textTheme.bodySmall!.color!),
               ),
             ),
           );
@@ -139,70 +221,257 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     );
   }
 
-  Widget _buildMatchDayPage(DateTime date) {
-    String formattedDate = DateFormat('EEEE, MMM d').format(date);
+  Map<String, List<Response>> groupFixturesByLeague(ApiResponse apiResponse) {
+  final Map<String, List<Response>> groupedFixtures = {};
 
-    return FutureBuilder<List<Match>>(
-      future: _fetchMatchesForDate(date),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+  for (var fixtureResponse in apiResponse.response) {
+    final leagueName = fixtureResponse.league!.name!;
+
+    if (groupedFixtures.containsKey(leagueName)) {
+      if (groupedFixtures[leagueName]!.length < 10) {
+        groupedFixtures[leagueName]!.add(fixtureResponse);
+      }
+    } else {
+      groupedFixtures[leagueName] = [fixtureResponse];
+    }
+  }
+
+  return groupedFixtures;
+}
+
+  Widget _buildMatchDayPage(DateTime date) {
+    _fixturesBloc = FixturesBloc();
+
+    return BlocBuilder<FixturesBloc, FixturesState>(
+      bloc: _fixturesBloc,
+      builder: (context, state) {
+        if (state is FixtureInitial) {
+          // Check cache first
+          if (_cache.containsKey(date)) {
+            return _buildFixturesPage(_cache[date]!);
+          } else {
+            _fixturesBloc.add(FetchFixtures(date));
+            return Center(child: CircularProgressIndicator());
+          }
+        } else if (state is FixturesLoading) {
           return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No matches for this day.'));
+        } else if (state is FixturesLoaded) {
+          // Cache the response
+          _cache[date] = state.response;
+          return _buildFixturesPage(state.response);
+        } else if (state is FixturesError) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(child: Text('Error: ${state.message}')),
+          );
         } else {
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              Match match = snapshot.data![index];
-              return ListTile(
-                title: Text('${match.homeTeam} vs ${match.awayTeam}'),
-                subtitle: Text('${formattedDate}'),
-              );
-            },
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(child: Text('No matches for this day.')),
           );
         }
       },
     );
   }
 
-  Future<List<Match>> _fetchMatchesForDate(DateTime date) async {
-    String dateKey = DateFormat('yyyy-MM-dd').format(date);
-    if (_cache.containsKey(dateKey) &&
-        DateTime.now().difference(_cache[dateKey]!.timestamp) <
-            _cacheDuration) {
-      return _cache[dateKey]!.data;
-    }
+  Widget _buildFixturesPage(ApiResponse apiResponse) {
+    final groupedFixtures = groupFixturesByLeague(apiResponse);
 
-    List<Match> matches =
-        await _fetchMatchesFromNetwork(date); // Fetch from network
-    _cache[dateKey] = _CachedData(matches, DateTime.now());
-    return matches;
+    return ListView.builder(
+      itemCount: groupedFixtures.keys.length,
+      itemBuilder: (context, index) {
+        final leagueName = groupedFixtures.keys.elementAt(index);
+        final fixtures = groupedFixtures[leagueName]!;
+
+        return 
+        
+        Container(
+          decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                    offset: Offset(0, 5),
+                    blurRadius: 6,
+                    spreadRadius: 6,
+                    color: Colors.grey.withOpacity(.1)),
+                BoxShadow(
+                    offset: Offset(5, 0),
+                    blurRadius: 6,
+                    spreadRadius: 6,
+                    color: Colors.grey.withOpacity(.1)),
+              ]),
+          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+          child: Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              dense: true,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(leagueName),
+                  Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 7),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context)
+                              .primaryColorDark
+                              .withOpacity(.1),
+                          borderRadius: BorderRadius.circular(4)),
+                      child: Text(
+                        fixtures.length.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Theme.of(context).textTheme.bodyMedium!.color),
+                      ))
+                ],
+              ),
+              children: fixtures.map((fixture) {
+                final status = fixture.fixture!.status;
+                
+                return Container(
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10))),
+                  child:
+                   scoreTile(fixture));
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  Future<List<Match>> _fetchMatchesFromNetwork(DateTime date) async {
-    // Your logic to fetch matches for the given date
-    // This is just a placeholder
-    await Future.delayed(Duration(seconds: 1)); // Simulate network delay
-    return [
-      Match(homeTeam: 'Team A', awayTeam: 'Team B', time: '12:00 PM'),
-      Match(homeTeam: 'Team C', awayTeam: 'Team D', time: '3:00 PM'),
-    ];
-  }
+Widget scoreTile(Response fixture){
+  return ListTile(
+                    leading: Container(
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Theme.of(context)
+                              .primaryColorDark
+                              .withOpacity(.1),
+                        ),
+                        child: Text(
+                          fixture.fixture!.status!.short!,
+                          style: TextStyle(fontSize: 12),
+                        )),
+                    title: Row(
+                      children: [
+                        //Home Ui
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      fixture.teams!.home['name'],
+                                      textAlign: TextAlign.end,
+                                      style:
+                                          TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!.color
+                                        ),
+                                    )),
+                                SizedBox(
+                                  width: 7,
+                                ),
+                                Image.network(
+                                  fixture.teams!.home['logo'],
+                                  width: 23,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        //Scores or Time UI
+                        Expanded(
+                          flex: 1,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                              child: fixture.fixture!.status!.short == 'NS' ||
+                                      fixture.fixture!.status!.short == 'PST'
+                                  ?
+                                  //Time UI
+                                  Container(
+                                      child: Text(
+                                        DateFormat('HH:mm')
+                                            .format(fixture.fixture!.date!),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                            decoration: fixture.fixture!.status!
+                                                        .short ==
+                                                    'PST'
+                                                ? TextDecoration.lineThrough
+                                                : null,
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall!
+                                                .color),
+                                      ),
+                                    )
+                                  :
+                                  //Scores UI
+                                  Container(
+                                      child: Text(
+                                          '${fixture.goals!.home} - ${fixture.goals!.away}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .color))),
+                            ),
+                          ),
+                        ),
+                        //Away UI
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Image.network(
+                                  fixture.teams!.away['logo'],
+                                  width: 23,
+                                ),
+                                SizedBox(
+                                  width: 7,
+                                ),
+                                Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      fixture.teams!.away['name'],
+                                      textAlign: TextAlign.start,
+                                      style:
+                                         TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                          color: Theme.of(context)
+                                            .textTheme
+                                            .bodySmall!.color
+                                        ),
+                                    )),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                
 }
 
-class _CachedData<T> {
-  final T data;
-  final DateTime timestamp;
-
-  _CachedData(this.data, this.timestamp);
-}
-
-class Match {
-  final String homeTeam;
-  final String awayTeam;
-  final String time;
-
-  Match({required this.homeTeam, required this.awayTeam, required this.time});
 }
