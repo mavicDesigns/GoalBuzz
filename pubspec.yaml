@@ -70,6 +70,10 @@ flutter:
   assets:
     - lib/assets/fonts/
     - lib/assets/lottie/mavicLoader.json
+    - lib/assets/images/madrid.png
+    - lib/assets/images/chelsea.png
+    - lib/assets/images/card_bg.png
+    - lib/assets/images/wallPaper_2.png
   fonts:
     - family: Urbanist
       fonts:

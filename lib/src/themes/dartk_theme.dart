@@ -9,8 +9,8 @@ class AppColors {
   static const Color tertiary = Color(0xFF252F2C); // Deeper green #252F2C
   static const Color background = Color(0xFF252525); // Dark background RGB(37,37,35)
   static const Color text1 = Colors.white; // Light gray for text
-  static const Color text2 = Color(0xFFB0B0B0); // Medium gray for text
-  static const Color text3 = Color.fromARGB(255, 158, 163, 176); // Light gray for text
+  static const Color text2 = Colors.white; // Medium gray for text
+  static const Color text3 = Colors.white; // Light gray for text
     static const Color cardColor = Color.fromRGBO(64, 64, 61, 1);
 
   static const Color text4 = Color(0xff252523); // Darker gray for background

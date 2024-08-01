@@ -38,7 +38,7 @@ final ThemeData lightTheme = ThemeData(
       ),
       titleTextStyle: TextStyle(
         fontFamily: 'Urbanist',
-        color: AppColors.text4,
+        color: AppColors.text3,
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),

@@ -13,7 +13,7 @@ class AppRoutes {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => MatchDetailsScreen());
+        return MaterialPageRoute(builder: (_) => MainScreen());
       case '/login':
         return MaterialPageRoute(builder: (_) => LoginScreen());
       default:

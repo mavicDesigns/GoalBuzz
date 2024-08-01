@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:truck/assets/fonts/MavicIcons/mavic_i_cons_icons.dart';
+import 'package:truck/src/components/widget/glass_card.dart';
 
 enum NavigationBarType { icons, text, both }
 
@@ -18,19 +19,23 @@ class BottomNavigationBarComponent extends StatelessWidget {
     return Container(
       height: 70,
       margin: EdgeInsets.only(bottom: 30, right: 20, left: 20),
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor
+          borderRadius: BorderRadius.circular(30), color: Colors.transparent),
+      child: GlassCard(
+        sigmaX: 20,
+        sigmaY: 20,
+        child: Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildNavItem(MavicICons.planet, 0, context),
+              _buildNavItem(MavicICons.calendar_week, 1, context),
+              _buildNavItem(MavicICons.phone, 2, context),
+              _buildNavItem(MavicICons.user_02, 3, context),
+            ],
           ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildNavItem(MavicICons.planet, 0, context),
-          _buildNavItem(MavicICons.calendar_week, 1, context),
-          _buildNavItem(MavicICons.phone, 2, context),
-          _buildNavItem(MavicICons.user_02, 3, context),
-        ],
+        ),
       ),
     );
   }

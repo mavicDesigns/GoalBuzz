@@ -6,7 +6,7 @@ import 'package:truck/src/components/widget/menu_button.dart';
 import 'package:truck/src/components/widget/navigation_drawer.dart';
 import 'package:truck/src/screens/pageview/live_screen.dart';
 import 'package:truck/src/screens/pageview/settings_screen.dart';
-import 'package:truck/src/screens/pageview/upcoming_screen.dart';
+import 'package:truck/src/screens/pageview/home_screen.dart';
 import 'package:truck/src/screens/pageview/voiceCall_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -18,8 +18,8 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
+    HomePage(),
     LiveMatchesScreen(),
-    UpcomingMatchesScreen(),
     VoiceCallRoomsScreen(),
     ProfileSettingsScreen(),
   ];
@@ -32,14 +32,18 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      
-      drawer: CustomNavigationDrawer(),
-      body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBarComponent(
-        currentIndex: _currentIndex,
-        onTap: _onTap,
-      ),
+    return Stack(
+      children: [
+        Scaffold(
+          drawer: CustomNavigationDrawer(),
+          body: _screens[_currentIndex],
+        ),
+        Positioned(
+            bottom: 0,
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: BottomNavigationBarComponent(currentIndex: _currentIndex))),
+      ],
     );
   }
 }
