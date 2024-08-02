@@ -1,11 +1,16 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:truck/assets/fonts/MavicIcons/mavic_i_cons_icons.dart';
 import 'package:truck/src/bloc/fixtures/fixtures.bloc.dart';
 import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
 import 'package:truck/src/components/widget/custom_button.dart';
+import 'package:truck/src/components/widget/glass_card.dart';
 import 'package:truck/src/models/api_response_model.dart';
 import 'package:truck/src/models/fixture_model.dart';
+import 'package:truck/src/screens/matchDetails/match_details_screen.dart';
+import 'package:truck/src/themes/light_theme.dart';
 
 class LiveMatchesScreen extends StatefulWidget {
   @override
@@ -72,7 +77,7 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
   void _scrollToCenter(int index) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       double screenWidth = MediaQuery.of(context).size.width;
-      double containerWidth = screenWidth / 4;
+      double containerWidth = screenWidth / 5.3;
 
       double scrollPosition =
           containerWidth * index - (screenWidth / 2 - containerWidth / 2);
@@ -117,14 +122,18 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
       create: (context) => FixturesBloc(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Live Matches',
-            style:
-                TextStyle(color: Theme.of(context).textTheme.bodyLarge!.color!),
-          ),
+          backgroundColor: Colors.transparent,
+          actions: [
+            IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  MavicICons.calendar_week,
+                  size: 28,
+                ))
+          ],
           centerTitle: false,
           bottom: PreferredSize(
-            preferredSize: Size.fromHeight(50),
+            preferredSize: Size.fromHeight(60),
             child: _buildDateNav(),
           ),
         ),
@@ -137,7 +146,7 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
               itemBuilder: (context, index) {
                 DateTime date = _dates[index];
                 return Container(
-                  margin: EdgeInsets.symmetric(vertical: 20),
+                  margin: EdgeInsets.symmetric(vertical: 5),
                   padding: const EdgeInsets.all(8.0),
                   child: _buildMatchDayPage(date),
                 );
@@ -198,21 +207,33 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
               _pageController.jumpToPage(index);
             },
             child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 13),
-              decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                          width: 5,
-                          color: index == _currentIndex
-                              ? Theme.of(context).textTheme.bodySmall!.color!
-                              : Colors.transparent))),
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Text(
-                formattedDate,
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).textTheme.bodySmall!.color!),
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: _currentIndex == index
+                        ? const Color.fromRGBO(75, 59, 137, 1)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                child: Column(
+                  children: [
+                    Text(
+                      DateFormat('E').format(date),
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.bodySmall!.color!),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      DateFormat('d').format(date),
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.bodySmall!.color!),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -222,22 +243,22 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
   }
 
   Map<String, List<Response>> groupFixturesByLeague(ApiResponse apiResponse) {
-  final Map<String, List<Response>> groupedFixtures = {};
+    final Map<String, List<Response>> groupedFixtures = {};
 
-  for (var fixtureResponse in apiResponse.response) {
-    final leagueName = fixtureResponse.league!.name!;
+    for (var fixtureResponse in apiResponse.response) {
+      final leagueName = fixtureResponse.league!.name!;
 
-    if (groupedFixtures.containsKey(leagueName)) {
-      if (groupedFixtures[leagueName]!.length < 10) {
-        groupedFixtures[leagueName]!.add(fixtureResponse);
+      if (groupedFixtures.containsKey(leagueName)) {
+        if (groupedFixtures[leagueName]!.length < 10) {
+          groupedFixtures[leagueName]!.add(fixtureResponse);
+        }
+      } else {
+        groupedFixtures[leagueName] = [fixtureResponse];
       }
-    } else {
-      groupedFixtures[leagueName] = [fixtureResponse];
     }
-  }
 
-  return groupedFixtures;
-}
+    return groupedFixtures;
+  }
 
   Widget _buildMatchDayPage(DateTime date) {
     _fixturesBloc = FixturesBloc();
@@ -283,28 +304,17 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
         final leagueName = groupedFixtures.keys.elementAt(index);
         final fixtures = groupedFixtures[leagueName]!;
 
-        return 
-        
-        Container(
+        return Container(
           decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                    offset: Offset(0, 5),
-                    blurRadius: 6,
-                    spreadRadius: 6,
-                    color: Colors.grey.withOpacity(.1)),
-                BoxShadow(
-                    offset: Offset(5, 0),
-                    blurRadius: 6,
-                    spreadRadius: 6,
-                    color: Colors.grey.withOpacity(.1)),
-              ]),
+            color: Color.fromARGB(255, 47, 51, 67),
+            borderRadius: BorderRadius.circular(10),
+          ),
           margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
           child: Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
+              iconColor: Theme.of(context).textTheme.bodyLarge!.color,
+              initiallyExpanded: true,
               dense: true,
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -315,7 +325,7 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
                       decoration: BoxDecoration(
                           color: Theme.of(context)
                               .primaryColorDark
-                              .withOpacity(.1),
+                              .withOpacity(.5),
                           borderRadius: BorderRadius.circular(4)),
                       child: Text(
                         fixtures.length.toString(),
@@ -328,15 +338,25 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
               ),
               children: fixtures.map((fixture) {
                 final status = fixture.fixture!.status;
-                
-                return Container(
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(10),
-                          bottomRight: Radius.circular(10))),
-                  child:
-                   scoreTile(fixture));
+
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            MatchDetailsScreen(response: fixture),
+                      ),
+                    );
+                  },
+                  child: Container(
+                      decoration: BoxDecoration(
+                          color: Color(0xFF2B2E3A),
+                          borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(10),
+                              bottomRight: Radius.circular(10))),
+                      child: scoreTile(fixture)),
+                );
               }).toList(),
             ),
           ),
@@ -345,133 +365,119 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     );
   }
 
-Widget scoreTile(Response fixture){
-  return ListTile(
-                    leading: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Theme.of(context)
-                              .primaryColorDark
-                              .withOpacity(.1),
-                        ),
+  Widget scoreTile(Response fixture) {
+    return ListTile(
+      leading: Container(
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Theme.of(context).primaryColorDark.withOpacity(.1),
+          ),
+          child: Text(
+            fixture.fixture!.status!.short!,
+            style: TextStyle(fontSize: 12),
+          )),
+      title: Row(
+        children: [
+          //Home Ui
+          Expanded(
+            flex: 2,
+            child: Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                      flex: 2,
+                      child: Text(
+                        fixture.teams!.home['name'],
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color:
+                                Theme.of(context).textTheme.bodySmall!.color),
+                      )),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  Image.network(
+                    fixture.teams!.home['logo'],
+                    width: 23,
+                  )
+                ],
+              ),
+            ),
+          ),
+          //Scores or Time UI
+          Expanded(
+            flex: 1,
+            child: Align(
+              alignment: Alignment.center,
+              child: Container(
+                child: fixture.fixture!.status!.short == 'NS' ||
+                        fixture.fixture!.status!.short == 'PST'
+                    ?
+                    //Time UI
+                    Container(
                         child: Text(
-                          fixture.fixture!.status!.short!,
-                          style: TextStyle(fontSize: 12),
-                        )),
-                    title: Row(
-                      children: [
-                        //Home Ui
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: Text(
-                                      fixture.teams!.home['name'],
-                                      textAlign: TextAlign.end,
-                                      style:
-                                          TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!.color
-                                        ),
-                                    )),
-                                SizedBox(
-                                  width: 7,
-                                ),
-                                Image.network(
-                                  fixture.teams!.home['logo'],
-                                  width: 23,
-                                )
-                              ],
-                            ),
-                          ),
+                          DateFormat('HH:mm').format(fixture.fixture!.date!),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                              decoration:
+                                  fixture.fixture!.status!.short == 'PST'
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall!.color),
                         ),
-                        //Scores or Time UI
-                        Expanded(
-                          flex: 1,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Container(
-                              child: fixture.fixture!.status!.short == 'NS' ||
-                                      fixture.fixture!.status!.short == 'PST'
-                                  ?
-                                  //Time UI
-                                  Container(
-                                      child: Text(
-                                        DateFormat('HH:mm')
-                                            .format(fixture.fixture!.date!),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12,
-                                            decoration: fixture.fixture!.status!
-                                                        .short ==
-                                                    'PST'
-                                                ? TextDecoration.lineThrough
-                                                : null,
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall!
-                                                .color),
-                                      ),
-                                    )
-                                  :
-                                  //Scores UI
-                                  Container(
-                                      child: Text(
-                                          '${fixture.goals!.home} - ${fixture.goals!.away}',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .color))),
-                            ),
-                          ),
-                        ),
-                        //Away UI
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Image.network(
-                                  fixture.teams!.away['logo'],
-                                  width: 23,
-                                ),
-                                SizedBox(
-                                  width: 7,
-                                ),
-                                Expanded(
-                                    flex: 2,
-                                    child: Text(
-                                      fixture.teams!.away['name'],
-                                      textAlign: TextAlign.start,
-                                      style:
-                                         TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall!.color
-                                        ),
-                                    )),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                
-}
-
+                      )
+                    :
+                    //Scores UI
+                    Container(
+                        child: Text(
+                            '${fixture.goals!.home} - ${fixture.goals!.away}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .color))),
+              ),
+            ),
+          ),
+          //Away UI
+          Expanded(
+            flex: 2,
+            child: Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Image.network(
+                    fixture.teams!.away['logo'],
+                    width: 23,
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  Expanded(
+                      flex: 2,
+                      child: Text(
+                        fixture.teams!.away['name'],
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color:
+                                Theme.of(context).textTheme.bodySmall!.color),
+                      )),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }

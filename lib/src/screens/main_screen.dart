@@ -42,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
             bottom: 0,
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
-              child: BottomNavigationBarComponent(currentIndex: _currentIndex))),
+              child: BottomNavigationBarComponent(currentIndex: _currentIndex, onTap: _onTap,))),
       ],
     );
   }

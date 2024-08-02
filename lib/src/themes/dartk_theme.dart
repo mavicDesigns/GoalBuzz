@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary1 = Color(0xFFFF6A5F); // Pastel red #FF6A5F
+  static const Color primary1 = Color(0xFF4B3B89); // Pastel red #FF6A5F
   static const Color primary2 = Color(0xFFBF5C5C); // Muted pastel red
   static const Color primary3 = Color(0xFFE3B7B7); // Light pastel red
   static const Color secondary1 = Color(0xFF465A54); // Dark green #465A54
   static const Color secondary2 = Color(0xFF6B8E6F); // Muted olive green
   static const Color tertiary = Color(0xFF252F2C); // Deeper green #252F2C
-  static const Color background = Color(0xFF252525); // Dark background RGB(37,37,35)
+  static const Color background =  Color(0xFF212631); // Dark background RGB(37,37,35)
   static const Color text1 = Colors.white; // Light gray for text
   static const Color text2 = Colors.white; // Medium gray for text
   static const Color text3 = Colors.white; // Light gray for text
-    static const Color cardColor = Color.fromRGBO(64, 64, 61, 1);
+    static const Color cardColor = Color(0xFF2B2E3A);
 
   static const Color text4 = Color(0xff252523); // Darker gray for background
 }
@@ -171,7 +171,7 @@ final ThemeData darkTheme = ThemeData(
     hintStyle: TextStyle(color: AppColors.text3),
   ),
   iconTheme: IconThemeData(
-    color: AppColors.primary1,
+    color: AppColors.text3,
   ),
 
   bottomNavigationBarTheme: BottomNavigationBarThemeData(

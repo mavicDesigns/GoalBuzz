@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary1 = Color(0xFFFF6A5F); // Pastel red #FF6A5F
+  static const Color primary1 = Color.fromRGBO(46, 52, 175, 1); // Pastel red #FF6A5F
   static const Color primary2 = Color(0xFFBF5C5C); // Muted pastel red
   static const Color primary3 = Color(0xFFE3B7B7); // Light pastel red
   static const Color secondary1 = Color(0xFF465A54); // Dark green #465A54
@@ -28,7 +28,7 @@ final ThemeData lightTheme = ThemeData(
       onBackground: AppColors.text1,
       onSurface: AppColors.text2,
     ),
-    scaffoldBackgroundColor: AppColors.text4,
+    scaffoldBackgroundColor: const Color.fromARGB(255, 237, 237, 234),
     appBarTheme: AppBarTheme(
           surfaceTintColor: Colors.white,
       backgroundColor: AppColors.cardColor,

@@ -9,6 +9,14 @@ class FetchFixtures extends FixtureEvent {
   FetchFixtures(this.date);
 }
 
+
+class FetchFixture extends FixtureEvent {
+  final int fixtureId;
+
+  FetchFixture(this.fixtureId);
+}
+
+
 // states.dart
 abstract class FixturesState {}
 

@@ -30,3 +30,28 @@ Future<ApiResponse> fetchFixturesFromNetwork(DateTime date) async {
     throw Exception('Failed to load matches');
   }
 }
+
+
+Future<ApiResponse> fetchFixture(int fixtureId) async {
+  final response = await http.get(
+    Uri.parse('$baseUrl/fixture?id=$fixtureId'),
+    headers: {
+      'x-apisports-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> responseBody = jsonDecode(response.body);
+    // Use ApiResponse.fromJson to parse the Map
+    
+
+
+    final ApiResponse data = ApiResponse.fromJson(responseBody);
+   
+    return data;
+  } else {
+    print(response.statusCode);
+    throw Exception('Failed to load matches');
+  }
+}

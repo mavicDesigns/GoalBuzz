@@ -15,5 +15,16 @@ class FixturesBloc extends Bloc<FixtureEvent, FixturesState> {
         emit(FixturesError('Failed to fetch topic details: $e'));
       }
     });
+
+    on<FetchFixture>((event, emit) async {
+      emit(FixturesLoading());
+      try {
+        // Fetch topic details from repository
+        final fixtureResponse = await fetchFixture(event.fixtureId);
+        emit(FixturesLoaded(fixtureResponse));
+      } catch (e) {
+        emit(FixturesError('Failed to fetch topic details: $e'));
+      }
+    });
   }
 }

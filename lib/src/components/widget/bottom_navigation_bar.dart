@@ -43,16 +43,19 @@ class BottomNavigationBarComponent extends StatelessWidget {
   Widget _buildNavItem(IconData icon, int index, BuildContext context) {
     final bool isSelected = currentIndex == index;
 
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-          color:
-              isSelected ? Theme.of(context).primaryColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(30)),
-      child: IconButton(
-        onPressed: () => onTap!(index),
-        color: Theme.of(context).textTheme.bodyMedium!.color,
-        icon: Icon(icon, size: 26),
+    return GestureDetector(
+      onTap: () => onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+            color:
+                isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(30)),
+        child: IconButton(
+          onPressed: () => onTap!(index),
+          color: Theme.of(context).textTheme.bodyMedium!.color,
+          icon: Icon(icon, size: 26),
+        ),
       ),
     );
   }

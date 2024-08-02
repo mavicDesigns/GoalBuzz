@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:truck/assets/fonts/MavicIcons/mavic_i_cons_icons.dart';
 import 'package:truck/src/components/widget/glass_card.dart';
+import 'package:truck/src/themes/dartk_theme.dart';
 
 class HomePage extends StatelessWidget {
   final String userName = "OreOfe"; // Replace with dynamic user name
@@ -11,42 +12,39 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        GlassCard(
-          sigmaX: 50,
-          sigmaY: 50,
-          image: Image.asset(
-            'lib/assets/images/card_bg.png',
-            width: double.infinity,
-            fit: BoxFit.cover,
-          ),
-          child: Scaffold(
+        Scaffold(
+          appBar: AppBar(
             backgroundColor: Colors.transparent,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              centerTitle: false,
-              title: Text('Welcome, $userName'),
-            ),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      height: 50,
-                    ),
-                    _buildYourTeams(),
-                    SizedBox(
-                      height: 50,
-                    ),
-                    _buildYourRooms(),
-                    _buildSectionTitle('Latest News and Updates', context),
-                    _buildNewsUpdates(),
-                    _buildSectionTitle('Upcoming Matches', context),
-                    _buildUpcomingMatches(),
-                  ],
+            centerTitle: false,
+            title: Text('Welcome, $userName'),
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 50,
                 ),
-              ),
+
+                _buildTeamCard(),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                  child: _buildSectionTitle('Live Matches', context),
+                ),
+                _buildYourTeams(),
+                SizedBox(
+                  height: 50,
+                ),
+                //_buildYourRooms(),
+                // _buildSectionTitle('Latest News and Updates', context),
+                // _buildNewsUpdates(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                  child: _buildSectionTitle('Upcoming Matches', context),
+                ),
+                _buildUpcomingMatches(),
+              ],
             ),
           ),
         ),
@@ -74,28 +72,113 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildTeamCard() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+         
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary1,
+                  const Color.fromRGBO(40, 62, 181, 1)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            width: 500,
+            height: 200,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                //Home Ui
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'lib/assets/images/chelsea.png',
+                        width: 70,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('Chelsea')
+                    ],
+                  ),
+                ),
+          
+                Text('VS'),
+          
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'lib/assets/images/madrid.png',
+                        width: 70,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text('Real Madrid')
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+       
+        Positioned(
+            bottom: -10,
+            left: 110,
+            child: Container(
+            width: 120,
+            padding: EdgeInsets.symmetric(vertical: 2, horizontal:  10),
+            height: 25,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+                          color: Color(0xFF2B2E3A),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset('lib/assets/images/laliga.png', width: 15,),
+                Text('Today, 08:30pm', style: TextStyle(fontSize: 10),)
+              ],
+            ),
+          )),
+ ],
+      ),
+    );
+  }
+
   Widget _buildYourTeams() {
     return Container(
-      height: 280,
+      height: 250,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildMatchCard('Team A vs Team B', 'Live'),
-          _buildMatchCard('Team C vs Team D', 'Upcoming'),
+          _buildMatchCard('Team A vs Team B', true),
+          _buildMatchCard('Team C vs Team D', true),
         ],
       ),
     );
   }
 
-  Widget _buildMatchCard(String match, String status) {
+  Widget _buildMatchCard(String match, bool status) {
     return Container(
-      width: 230,
+      width: 170,
       height: 280,
       decoration: BoxDecoration(
-          color: Colors.transparent,
-          border: Border.all(
-            color: Colors.white.withOpacity(.3)
-          ), borderRadius: BorderRadius.circular(10)),
+          color: Color(0xFF2B2E3A),
+        //  border: Border.all(width: 2, color: const Color.fromRGBO(75, 59, 137, 1)),
+          borderRadius: BorderRadius.circular(10)),
       margin: EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -103,16 +186,21 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                    decoration: BoxDecoration(
-                        color: Colors.greenAccent,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Text('Live', style: TextStyle(fontSize: 12))),
-              ],
-            ),
+            status == true
+                ? Row(
+                    children: [
+                      Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                          decoration: BoxDecoration(
+                              color: Colors.greenAccent,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Text('Live',
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.black))),
+                    ],
+                  )
+                : Container(),
 
             //TEam Logos
             Expanded(
@@ -122,15 +210,11 @@ class HomePage extends StatelessWidget {
                 children: [
                   Image.asset(
                     'lib/assets/images/madrid.png',
-                    width: 60,
-                  ),
-                  Text(
-                    '-',
-                    style: TextStyle(fontSize: 32),
+                    width: 40,
                   ),
                   Image.asset(
                     'lib/assets/images/chelsea.png',
-                    width: 60,
+                    width: 40,
                   )
                 ],
               ),
@@ -167,12 +251,9 @@ class HomePage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Text(
-            'Active Rooms',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+        Text(
+          'Active Rooms',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         _buildRoomCard('Chelsea vs Madrid'),
         //_buildRoomCard('Room 2: Match B'),
@@ -181,21 +262,21 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildRoomCard(String room) {
-    return SizedBox(
-      width: 500,
-      height: 150,
-      child: GlassCard(
-        sigmaX: 5,
-        sigmaY: 5,
+    return GlassCard(
+      sigmaX: 5,
+      sigmaY: 5,
+      child: Container(
+        margin: EdgeInsets.all(8),
         child: Container(
-          margin: EdgeInsets.all(8),
-          child: Container(
-            alignment: Alignment.bottomLeft,
-            height: 150,
-            width: double.infinity,
-            padding: EdgeInsets.all(16),
-            child: Text(room),
-          ),
+          alignment: Alignment.bottomLeft,
+          height: 150,
+          decoration: BoxDecoration(
+              color: Colors.white.withOpacity(.2),
+              border: Border.all(color: Colors.white.withOpacity(.3)),
+              borderRadius: BorderRadius.circular(10)),
+          width: double.infinity,
+          padding: EdgeInsets.all(16),
+          child: Text(room),
         ),
       ),
     );
@@ -221,11 +302,15 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildUpcomingMatches() {
-    return Column(
-      children: [
-        _buildMatchCard('Team A vs Team B', 'Upcoming'),
-        _buildMatchCard('Team C vs Team D', 'Upcoming'),
-      ],
+    return SizedBox(
+      height: 200,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _buildMatchCard('Team A vs Team B', false),
+          _buildMatchCard('Team C vs Team D', false),
+        ],
+      ),
     );
   }
 }
