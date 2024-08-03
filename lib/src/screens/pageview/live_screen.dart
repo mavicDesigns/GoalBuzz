@@ -242,10 +242,10 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     );
   }
 
-  Map<String, List<Response>> groupFixturesByLeague(ApiResponse apiResponse) {
-    final Map<String, List<Response>> groupedFixtures = {};
+  Map<String, List<Data>> groupFixturesByLeague(ApiResponse apiResponse) {
+    final Map<String, List<Data>> groupedFixtures = {};
 
-    for (var fixtureResponse in apiResponse.response) {
+    for (var fixtureResponse in apiResponse.data) {
       final leagueName = fixtureResponse.league!.name!;
 
       if (groupedFixtures.containsKey(leagueName)) {
@@ -365,7 +365,7 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     );
   }
 
-  Widget scoreTile(Response fixture) {
+  Widget scoreTile(Data fixture) {
     return ListTile(
       leading: Container(
           padding: EdgeInsets.all(5),

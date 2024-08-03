@@ -6,7 +6,7 @@ import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
 import 'package:truck/src/models/api_response_model.dart';
 
 class DetailsPageView extends StatefulWidget {
-  final Response response;
+  final Data response;
 
   const DetailsPageView({super.key, required this.response});
 

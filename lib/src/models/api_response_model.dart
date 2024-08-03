@@ -23,7 +23,7 @@ class ApiResponse {
   List<dynamic> errors;
   int results;
   Paging paging;
-  List<Response> response;
+  List<Data> data;
 
   ApiResponse({
     required this.apiResponseGet,
@@ -31,7 +31,7 @@ class ApiResponse {
     required this.errors,
     required this.results,
     required this.paging,
-    required this.response,
+    required this.data,
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) => ApiResponse(
@@ -40,8 +40,8 @@ class ApiResponse {
         errors: List<dynamic>.from(json["errors"].map((x) => x)),
         results: json["results"],
         paging: Paging.fromJson(json["paging"]),
-        response: List<Response>.from(
-            json["response"].map((x) => Response.fromJson(x))),
+        data: List<Data>.from(
+            json["response"].map((x) => Data.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,7 +50,7 @@ class ApiResponse {
         "errors": List<dynamic>.from(errors.map((x) => x)),
         "results": results,
         "paging": paging.toJson(),
-        "response": List<dynamic>.from(response.map((x) => x.toJson())),
+        "response": List<dynamic>.from(data.map((x) => x.toJson())),
       };
 }
 
@@ -90,7 +90,7 @@ class Parameters {
       };
 }
 
-class Response {
+class Data {
   Fixture? fixture;
   League? league;
   TeamsClass? teams;
@@ -101,7 +101,7 @@ class Response {
   List<Statistics>? statistics;
   List<TeamPlayers>? teamPlayers;
 
-  Response({
+  Data({
     this.fixture,
     this.league,
     this.teams,
@@ -113,7 +113,7 @@ class Response {
     this.teamPlayers,
   });
 
-  factory Response.fromJson(Map<String, dynamic> json) => Response(
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
         fixture:
             json["fixture"] == null ? null : Fixture.fromJson(json["fixture"]),
         league: json["league"] == null ? null : League.fromJson(json["league"]),
@@ -129,14 +129,12 @@ class Response {
             ? []
             : List<Lineup>.from(
                 json["lineups"]!.map((x) => Lineup.fromJson(x))),
-        statistics: json["statistics"] == null
-            ? []
-            : List<Statistics>.from(
-                json["statistics"]!.map((x) => Statistics.fromJson(x))),
+               statistics: json["statistics"] == null ? [] : List<Statistics>.from(json["statistics"]!.map((x) => Statistics.fromJson(x))),
+
         teamPlayers: json["players"] == null
             ? []
             : List<TeamPlayers>.from(
-                json["players"]!.map((x) => Player.fromJson(x))),
+                json["players"]!.map((x) => TeamPlayers.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {

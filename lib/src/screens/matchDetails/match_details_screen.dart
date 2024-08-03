@@ -6,12 +6,13 @@ import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
 import 'package:truck/src/models/api_response_model.dart';
 import 'package:truck/src/models/score_model.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/details_page_screen.dart';
+import 'package:truck/src/screens/matchDetails/pageviews/lineup_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/stats_screen.dart';
 
 import '../../models/fixture_model.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
-  final Response response;
+  final Data response;
 
   const MatchDetailsScreen({Key? key, required this.response})
       : super(key: key);
@@ -262,8 +263,8 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
         },
         body: TabBarView(controller: _tabController, children: [
           DetailsPageView(response: widget.response,),
+          LineUpPageView(response: widget.response),
           StatsPageView(response: widget.response,),
-          DetailsPageView(response: widget.response,),
           DetailsPageView(response: widget.response,),
         ]),
       ),

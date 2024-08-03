@@ -42,9 +42,10 @@ Future<ApiResponse> fetchFixture(int fixtureId) async {
   );
 
   if (response.statusCode == 200) {
+
     final Map<String, dynamic> responseBody = jsonDecode(response.body);
     // Use ApiResponse.fromJson to parse the Map
-    
+
 
 
     final ApiResponse data = ApiResponse.fromJson(responseBody);
