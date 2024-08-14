@@ -435,8 +435,16 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
                     :
                     //Scores UI
                     Container(
-                        child: Text(
+                        child: fixture.fixture!.status!.short != 'TBD' ? Text(
                             '${fixture.goals!.home} - ${fixture.goals!.away}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .color)): Text(
+                            '${DateFormat('hh:mm').format(fixture.fixture!.date!)}',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,

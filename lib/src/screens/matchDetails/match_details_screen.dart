@@ -1,15 +1,15 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:truck/assets/fonts/MavicIcons/mavic_i_cons_icons.dart';
 import 'package:truck/src/bloc/fixtures/fixtures.bloc.dart';
 import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
 import 'package:truck/src/models/api_response_model.dart';
-import 'package:truck/src/models/score_model.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/details_page_screen.dart';
+import 'package:truck/src/screens/matchDetails/pageviews/head_to_head_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/lineup_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/stats_screen.dart';
-
-import '../../models/fixture_model.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
   final Data response;
@@ -24,6 +24,10 @@ class MatchDetailsScreen extends StatefulWidget {
 class _MatchDetailsScreenState extends State<MatchDetailsScreen>
     with SingleTickerProviderStateMixin {
   late FixturesBloc _fixturesBloc;
+
+  late Timer? _timer;
+  late Duration _duration;
+  bool _showCountdown = true;
 
   late ScrollController _scrollController;
   late TabController _tabController;
@@ -51,6 +55,21 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
     _fixturesBloc.add(FetchFixture(widget.response.fixture!.id!));
     _tabController = TabController(vsync: this, length: pageViewNavs.length);
     _scrollController = ScrollController()..addListener(_onScroll);
+
+    final now = DateTime.now();
+    final targetTime = widget.response.fixture!.date!;
+
+    // Calculate the initial duration
+    _duration = targetTime.difference(now);
+    _startCountdown();
+
+    // If the time is in the past, remove the widget
+    if (_duration.isNegative) {
+      _timer!.cancel();
+      setState(() {
+        _showCountdown = false;
+      });
+    }
   }
 
   void _onScroll() {
@@ -72,6 +91,10 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
   @override
   void dispose() {
     _scrollController.dispose();
+    if (_timer != null) {
+  _timer!.cancel();
+}
+
     _tabController.dispose();
     super.dispose();
   }
@@ -145,12 +168,18 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
           alignment: Alignment.center,
           child: Row(
             children: [
-              _buildTeamColumn(widget.response.teams!.home['logo'], 'Chelsea',
-                  _translateX, _imageBoxMargin, Alignment.centerRight),
-              _buildScoreColumn(),
+              _buildTeamColumn(
+                  widget.response.teams!.home['logo'],
+                  widget.response.teams!.home['name'],
+                  _translateX,
+                  _imageBoxMargin,
+                  Alignment.centerRight),
+              widget.response.fixture!.status!.elapsed != null
+                  ? _buildScoreColumn()
+                  : _buildTimeColumn(),
               _buildTeamColumn(
                   widget.response.teams!.away['logo'],
-                  'Real Madrid',
+                  widget.response.teams!.away['name'],
                   -_translateX,
                   _imageBoxMargin,
                   Alignment.centerLeft),
@@ -181,6 +210,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
                   opacity: _textOpacity,
                   child: Text(
                     teamName,
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -196,12 +226,28 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
     );
   }
 
-  Widget _buildScoreColumn() {
-    final Score? score = widget.response.score;
-        final Fixture? fixture = widget.response.fixture;
+  void _startCountdown() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_duration.inSeconds > 0) {
+          _duration = _duration - Duration(seconds: 1);
+        } else {
+          _timer?.cancel();
+          _showCountdown = false;
+        }
+      });
+    });
+  }
+
+  Widget _buildTimeColumn() {
+    final Fixture? fixture = widget.response.fixture;
+
+    final hours = _duration.inHours.toString().padLeft(2, '0');
+    final minutes = (_duration.inMinutes % 60).toString().padLeft(2, '0');
+    final seconds = (_duration.inSeconds % 60).toString().padLeft(2, '0');
 
     return Expanded(
-      flex: 3,
+      flex: 2,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -210,7 +256,45 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
           Transform.scale(
             scale: _imageScale,
             child: Text(
-              '${score!.fulltime!.home.toString()} - ${score.fulltime!.away.toString()}',
+              DateFormat('hh:mm').format(fixture!.date!),
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).textTheme.displayLarge!.color,
+              ),
+            ),
+          ),
+          Opacity(
+            opacity: _textOpacity,
+            child: Text(
+              "$hours:$minutes:$seconds",
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).textTheme.bodyLarge!.color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreColumn() {
+    final Score? score = widget.response.score;
+    final TeamsClass goals = widget.response.goals!;
+    final Fixture? fixture = widget.response.fixture;
+
+    return Expanded(
+      flex: 2,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: _scoreBoxMargin),
+          Text(''),
+          Transform.scale(
+            scale: _imageScale,
+            child: Text(
+              '${goals.home.toString()} - ${goals.away.toString()}',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
@@ -262,10 +346,16 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
           ];
         },
         body: TabBarView(controller: _tabController, children: [
-          DetailsPageView(response: widget.response,),
+          DetailsPageView(
+            response: widget.response,
+          ),
           LineUpPageView(response: widget.response),
-          StatsPageView(response: widget.response,),
-          DetailsPageView(response: widget.response,),
+          StatsPageView(
+            response: widget.response,
+          ),
+          HeadToHeadPageView(
+            response: widget.response,
+          ),
         ]),
       ),
     );

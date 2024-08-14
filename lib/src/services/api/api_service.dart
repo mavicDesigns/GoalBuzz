@@ -47,6 +47,34 @@ Future<ApiResponse> fetchFixture(int fixtureId) async {
     // Use ApiResponse.fromJson to parse the Map
 
 
+    final ApiResponse data = ApiResponse.fromJson(responseBody);
+    
+   
+    return data;
+  } else {
+    print(response.statusCode);
+    throw Exception('Failed to load matches');
+  }
+}
+
+
+
+
+Future<ApiResponse> fetchH2h(int homeId, int awayId,) async {
+  final response = await http.get(
+    Uri.parse('$baseUrl/fixtures/headtohead?h2h=$homeId-$awayId'),
+    headers: {
+      'x-apisports-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+
+    final Map<String, dynamic> responseBody = jsonDecode(response.body);
+    // Use ApiResponse.fromJson to parse the Map
+
+
 
     final ApiResponse data = ApiResponse.fromJson(responseBody);
    

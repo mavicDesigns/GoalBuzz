@@ -14,7 +14,7 @@ class DetailsPageView extends StatefulWidget {
   State<DetailsPageView> createState() => _DetailsPageViewState();
 }
 
-class _DetailsPageViewState extends State<DetailsPageView> {
+class _DetailsPageViewState extends State<DetailsPageView>  with AutomaticKeepAliveClientMixin{
   late FixturesBloc _fixturesBloc;
 
   @override
@@ -31,6 +31,7 @@ class _DetailsPageViewState extends State<DetailsPageView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: BlocBuilder<FixturesBloc, FixturesState>(
@@ -104,4 +105,8 @@ class _DetailsPageViewState extends State<DetailsPageView> {
       ),
     );
   }
+  
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

@@ -6,8 +6,6 @@ import 'package:truck/assets/fonts/MavicIcons/mavic_i_cons_icons.dart';
 import 'package:truck/src/bloc/fixtures/fixtures.bloc.dart';
 import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
 import 'package:truck/src/models/api_response_model.dart';
-import 'package:truck/src/models/players_model.dart';
-import 'package:truck/src/models/statistics.model.dart';
 import 'package:truck/src/themes/dartk_theme.dart';
 
 class StatsPageView extends StatefulWidget {
@@ -19,7 +17,7 @@ class StatsPageView extends StatefulWidget {
   State<StatsPageView> createState() => _StatsPageViewState();
 }
 
-class _StatsPageViewState extends State<StatsPageView> {
+class _StatsPageViewState extends State<StatsPageView>  with AutomaticKeepAliveClientMixin{
   late FixturesBloc _fixturesBloc;
 
   @override
@@ -42,9 +40,8 @@ class _StatsPageViewState extends State<StatsPageView> {
               final statistics = state.response.data[0].statistics;
               final List<TeamPlayers> teamPlayers =
                   state.response.data[0].teamPlayers!;
-              // print(state.response.data[0].toJson());
 
-              if (statistics!.length > 0) {
+              if (statistics!.isNotEmpty) {
                 return CustomScrollView(
                   slivers: [
                     
@@ -78,7 +75,7 @@ class _StatsPageViewState extends State<StatsPageView> {
                   ],
                 );
               } else {
-                Center(child: Text('No Data for this match'));
+                return const Center(child: Text('No Data for this match'));
               }
             } else if (state is FixturesError) {
               return Center(child: Text(state.message));
@@ -437,7 +434,9 @@ class _StatsPageViewState extends State<StatsPageView> {
       ),
     );
   }
-
-
+  
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 
 }

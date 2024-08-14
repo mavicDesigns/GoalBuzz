@@ -17,6 +17,15 @@ class FetchFixture extends FixtureEvent {
 }
 
 
+class FetchH2H extends FixtureEvent {
+  final int homeId;
+    final int awayId;
+
+
+  FetchH2H(this.homeId, this.awayId);
+}
+
+
 // states.dart
 abstract class FixturesState {}
 
