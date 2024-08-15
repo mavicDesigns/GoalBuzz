@@ -6,6 +6,7 @@ import 'package:truck/src/bloc/fixtures/fixtures.bloc.dart';
 import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
 import 'package:truck/src/components/widget/custom_button.dart';
 import 'package:truck/src/models/api_response_model.dart';
+import 'package:truck/src/screens/playerDetails/player_details_screen.dart';
 import 'package:truck/src/themes/light_theme.dart';
 
 class LineUpPageView extends StatefulWidget {
@@ -320,28 +321,39 @@ _responseData = state.response.data[0];
 
   Widget _buildPlayer(StartXiPlayer playerInfo) {
     return Expanded(
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 20.0,
-            backgroundColor: Color.fromARGB(255, 115, 137, 188),
-            child: Text(
-              playerInfo.number.toString(),
-              style: TextStyle(
-                color: Colors.white,
+      child: GestureDetector(
+         onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PlayerDetailsScreen(playerId: playerInfo.id!,),
+                      ),
+                    );
+                  },
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 20.0,
+              backgroundColor: Color.fromARGB(255, 115, 137, 188),
+              child: Text(
+                playerInfo.number.toString(),
+                style: TextStyle(
+                  color: Colors.white,
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 5),
-          Text(
-            extractLastName(playerInfo.name!),
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 11,
+            SizedBox(height: 5),
+            Text(
+              extractLastName(playerInfo.name!),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

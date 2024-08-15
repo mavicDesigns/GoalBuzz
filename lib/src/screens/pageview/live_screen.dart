@@ -113,7 +113,7 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     super.dispose();
   }
 
-  final Map<DateTime, ApiResponse> _cache = {};
+  final Map<DateTime, FixtureResponse> _cache = {};
   late FixturesBloc _fixturesBloc;
 
   @override
@@ -242,7 +242,7 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     );
   }
 
-  Map<String, List<Data>> groupFixturesByLeague(ApiResponse apiResponse) {
+  Map<String, List<Data>> groupFixturesByLeague(FixtureResponse apiResponse) {
     final Map<String, List<Data>> groupedFixtures = {};
 
     for (var fixtureResponse in apiResponse.data) {
@@ -295,7 +295,7 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
     );
   }
 
-  Widget _buildFixturesPage(ApiResponse apiResponse) {
+  Widget _buildFixturesPage(FixtureResponse apiResponse) {
     final groupedFixtures = groupFixturesByLeague(apiResponse);
 
     return ListView.builder(

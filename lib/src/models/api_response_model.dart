@@ -1,14 +1,5 @@
-// To parse this JSON data, do
-//
-//     final apiResponse = apiResponseFromJson(jsonString);
 
-import 'dart:convert';
-
-ApiResponse apiResponseFromJson(String str) => ApiResponse.fromJson(json.decode(str));
-
-String apiResponseToJson(ApiResponse data) => json.encode(data.toJson());
-
-class ApiResponse {
+class FixtureResponse {
     String? apiResponseGet;
     Parameters? parameters;
     List<dynamic>? errors;
@@ -16,7 +7,7 @@ class ApiResponse {
     Paging? paging;
     List<Data> data;
 
-    ApiResponse({
+    FixtureResponse({
         required this.apiResponseGet,
         required this.parameters,
         required this.errors,
@@ -25,7 +16,7 @@ class ApiResponse {
         required this.data,
     });
 
-    factory ApiResponse.fromJson(Map<String, dynamic> json) => ApiResponse(
+    factory FixtureResponse.fromJson(Map<String, dynamic> json) => FixtureResponse(
      
         apiResponseGet: json["get"],
         parameters: Parameters.fromJson(json["parameters"]),

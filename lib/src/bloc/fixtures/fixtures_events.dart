@@ -34,7 +34,7 @@ class FixtureInitial extends FixturesState {}
 class FixturesLoading extends FixturesState {}
 
 class FixturesLoaded extends FixturesState {
-  final ApiResponse response;
+  final FixtureResponse response;
 
   FixturesLoaded(this.response);
 }
