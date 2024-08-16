@@ -14,6 +14,7 @@ import 'package:truck/src/screens/matchDetails/pageviews/details_page_screen.dar
 import 'package:truck/src/screens/matchDetails/pageviews/head_to_head_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/lineup_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/stats_screen.dart';
+import 'package:truck/src/screens/playerDetails/pageview/overviewPage.dart';
 
 class PlayerDetailsScreen extends StatefulWidget {
   final int playerId;
@@ -35,7 +36,7 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
   late PlayerResponse _playerResponse;
 
   static const double collapsedBarHeight = 60.0;
-  static const double expandedBarHeight = 320.0;
+  static const double expandedBarHeight = 350.0;
   static const double maxOffset = expandedBarHeight - 150;
   static const double initialTranslateX = 0;
   static const double finalTranslateX = 70;
@@ -119,27 +120,197 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
         ),
         child: playerResponse.responseData.isNotEmpty
             ? Container(
-              margin: const EdgeInsets.only(top: 100.0,left: 20 ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Positioned(
+                      bottom: 10,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Theme.of(context).canvasColor,
+                            borderRadius: BorderRadius.circular(10)),
+                        height: 170,
+                        width: MediaQuery.of(context).size.width * .93,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: Container(),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  //Club Data
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        Image.network(
+                                          playerResponse.responseData[0]
+                                              .statistics[0].team!.logo!,
+                                          width: 50,
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            playerResponse
+                                                .responseData[0].player.name!,
+                                            //textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+
+                                  //Personal Details
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        //Height Data
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text(
+                                              playerResponse.responseData[0]
+                                                  .player.height!,
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              'Height',
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .color!
+                                                      .withOpacity(.5),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+
+                                        //Age Data
+                                        Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text(
+                                              playerResponse.responseData[0]
+                                                      .player.age!
+                                                      .toString() +
+                                                  ' Years',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Text(
+                                              DateFormat('dd MMM yyyy').format(
+                                                  playerResponse.responseData[0]
+                                                      .player.birth!.date!),
+                                              style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .bodySmall!
+                                                      .color!
+                                                      .withOpacity(.5),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  //Nationality
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 30,
+                                      vertical: 10,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Country:',
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall!
+                                                  .color!
+                                                  .withOpacity(.5),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          playerResponse.responseData[0].player
+                                              .nationality!,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    //Player Image
+                    Positioned(
+                        bottom: 70,
+                        left: 23,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(30),
+                          child: Container(
+                            child: Image.network(
+                              playerResponse.responseData[0].player.photo!,
+                              width: 150,
+                            ),
+                          ),
+                        )),
+                  ],
+                ),
+              )
+            : Container(
+                margin: const EdgeInsets.only(top: 100.0, left: 20),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Player Details
                     Container(),
-              
+
                     //Player Image
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
+                      borderRadius: BorderRadius.circular(30),
                       child: Container(
-                        child: Image.network(playerResponse.responseData[0].player.photo!,),
+                        child: Image.network(
+                          playerResponse.responseData[0].player.photo!,
+                          width: 120,
+                        ),
                       ),
                     )
-                    ],
-                ),
-            )
-            : Center(
-                child: Text(
-                  'Could not retrieve player Details',
-                  style: TextStyle(fontSize: 34),
+                  ],
                 ),
               ),
       ),
@@ -170,42 +341,6 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
     ];
   }
 
-  Widget _buildTeamColumn(String imagePath, String teamName, double translateX,
-      double margin, Alignment alignment) {
-    return Expanded(
-      flex: 2,
-      child: Transform.translate(
-        offset: Offset(translateX, 0),
-        child: Transform.scale(
-          scale: _imageScale,
-          child: Align(
-            alignment: alignment,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: margin),
-                Image.network(imagePath, width: 75),
-                SizedBox(height: 10),
-                Opacity(
-                  opacity: _textOpacity,
-                  child: Text(
-                    teamName,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.displayLarge!.color,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -216,14 +351,28 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
               return Center(child: CircularProgressIndicator());
             } else if (state is PlayerLoaded) {
               return NestedScrollView(
-                  controller: _scrollController,
-                  headerSliverBuilder:
-                      (BuildContext context, bool innerBoxIsScrolled) {
-                    return <Widget>[
-                      _buildAppBar(state.response),
-                    ];
-                  },
-                  body: Container());
+                controller: _scrollController,
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    _buildAppBar(state.response),
+                  ];
+                },
+                body: TabBarView(controller: _tabController, children: [
+                  SingleChildScrollView(
+                    child: OverViewPage(
+                      playerResponse: state.response,
+                    ),
+                  ),
+                  OverViewPage(
+                    playerResponse: state.response,
+                  ),OverViewPage(
+                    playerResponse: state.response,
+                  ),OverViewPage(
+                    playerResponse: state.response,
+                  ),
+                ]),
+              );
             } else if (state is PlayerError) {
               return Center(child: Text(state.message));
             }
@@ -231,32 +380,4 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
           }),
     );
   }
-}
-
-class BottomCurveClipper extends CustomClipper<Path> {
-  final double scrollOffset;
-
-  BottomCurveClipper(this.scrollOffset);
-
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    path.lineTo(0, size.height - 40);
-
-    double normalizedOffset = min(scrollOffset, 170.0);
-    double controlPointY = size.height + (20 - (normalizedOffset / 3));
-
-    path.quadraticBezierTo(
-      size.width / 2,
-      controlPointY,
-      size.width,
-      size.height - 40,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }
