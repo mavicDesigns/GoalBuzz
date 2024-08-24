@@ -4,7 +4,8 @@ import 'package:truck/src/models/players_model.dart';
 class OverViewPage extends StatefulWidget {
   final PlayerResponse playerResponse;
 
-  const OverViewPage({Key? key, required this.playerResponse}) : super(key: key);
+  const OverViewPage({Key? key, required this.playerResponse})
+      : super(key: key);
 
   @override
   State<OverViewPage> createState() => _OverViewPageState();
@@ -15,10 +16,15 @@ class _OverViewPageState extends State<OverViewPage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return RefreshIndicator(
-      onRefresh: _onRefresh,
-      child: Column(
-        children: [_buildDetailsCard(), _buildPositionCard('Central Midfielder')],
+    return SingleChildScrollView(
+      child: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: Column(
+          children: [
+            _buildDetailsCard(),
+            _buildPositionCard('Central Midfielder')
+          ],
+        ),
       ),
     );
   }
@@ -53,7 +59,9 @@ class _OverViewPageState extends State<OverViewPage>
                     children: [
                       const Text(
                         "Primary",
-                        style: TextStyle(fontSize: 16, color: Color.fromRGBO(105, 240, 174, .7)),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(105, 240, 174, .7)),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -68,8 +76,8 @@ class _OverViewPageState extends State<OverViewPage>
                 Expanded(
                   flex: 2,
                   child: Container(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                    margin: const EdgeInsets.symmetric(
+                        vertical: 30, horizontal: 10),
                     height: 270,
                     child: CustomPaint(
                       painter: FootballPitchPainter(
@@ -91,19 +99,49 @@ class _OverViewPageState extends State<OverViewPage>
   Widget _buildDetailsCard() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-      child: Padding(
+      child: Container(
+        height: 320,
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: GridView.count(
+          crossAxisCount: 3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          shrinkWrap: true,
+          physics:
+              NeverScrollableScrollPhysics(), // Prevents scrolling in case it's inside another scrollable widget
           children: [
-            _buildDetailCard('Appearances',
-                widget.playerResponse.responseData[0].statistics[0].games!.appearences.toString()),
-            const SizedBox(width: 10),
-            _buildDetailCard('Goals',
-                widget.playerResponse.responseData[0].statistics[0].goals!.total.toString()),
-            const SizedBox(width: 10),
-            _buildDetailCard('Assists',
-                widget.playerResponse.responseData[0].statistics[0].goals!.assists.toString()),
+            _buildDetailCard(
+              'Appearances',
+              widget.playerResponse.responseData[0].statistics[0].games!
+                  .appearences
+                  .toString(),
+            ),
+            _buildDetailCard(
+              'Goals',
+              widget.playerResponse.responseData[0].statistics[0].goals!.total
+                  .toString(),
+            ),
+            _buildDetailCard(
+              'Assists',
+              widget.playerResponse.responseData[0].statistics[0].goals!.assists
+                  .toString(),
+            ),
+            _buildDetailCard(
+              'Minutes',
+              widget.playerResponse.responseData[0].statistics[0].games!
+                  .minutes
+                  .toString(),
+            ),
+            _buildDetailCard(
+              'Starts',
+              widget.playerResponse.responseData[0].statistics[0].games!.lineups
+                  .toString(),
+            ),
+            _buildRatingsCard(
+              'Ratings',
+              widget.playerResponse.responseData[0].statistics[0].games!.rating!
+                  ,
+            ),
           ],
         ),
       ),
@@ -111,40 +149,69 @@ class _OverViewPageState extends State<OverViewPage>
   }
 
   Widget _buildDetailCard(String title, String value) {
-    return Expanded(
-      child: Container(
-        height: 120,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                color: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .color!
-                    .withOpacity(.5),
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .color!
+                  .withOpacity(.5),
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 10),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
+
+
+  Widget _buildRatingsCard(String title, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              color: Theme.of(context)
+                  .textTheme
+                  .bodySmall!
+                  .color!
+                  .withOpacity(.5),
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+         Align(alignment: Alignment.bottomRight, child: RatingsWidget(ratingValue: value))
+        ],
+      ),
+    );
+  }
+
 
   String _getAbbreviatedPosition(String position) {
     switch (position.toLowerCase()) {
@@ -188,15 +255,14 @@ class FootballPitchPainter extends CustomPainter {
     canvas.drawRect(pitchRect, pitchPaint);
 
     canvas.drawLine(
-        Offset(0, size.height / 2),
-        Offset(size.width, size.height / 2),
-        paint);
+        Offset(0, size.height / 2), Offset(size.width, size.height / 2), paint);
 
     canvas.drawCircle(
         Offset(size.width / 2, size.height / 2), size.width / 7, paint);
 
     canvas.drawRect(
-        Rect.fromLTWH(size.height * 0.15, 0, size.height * 0.4, size.width * 0.2),
+        Rect.fromLTWH(
+            size.height * 0.15, 0, size.height * 0.4, size.width * 0.2),
         paint);
     canvas.drawRect(
         Rect.fromLTWH(size.height * 0.15, size.height - (size.width * 0.2),
@@ -250,12 +316,55 @@ class FootballPitchPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     );
     textPainter.layout();
-    textPainter.paint(
-        canvas, positionOffset - Offset(textPainter.width / 2, textPainter.height / 2));
+    textPainter.paint(canvas,
+        positionOffset - Offset(textPainter.width / 2, textPainter.height / 2));
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;
+  }
+}
+
+
+
+class RatingsWidget extends StatelessWidget {
+  final String ratingValue;
+
+  RatingsWidget({required this.ratingValue});
+
+  @override
+  Widget build(BuildContext context) {
+    // Step 1: Convert the string to a double and round it to 1 decimal place
+    double value = double.parse(ratingValue);
+    double roundedValue = double.parse(value.toStringAsFixed(1));
+
+    // Step 2: Determine the container color based on the rounded value
+    Color containerColor;
+    if (roundedValue < 7.0) {
+      containerColor = Color.fromARGB(255, 176, 104, 56);
+    } else if (roundedValue >= 7.0 && roundedValue < 8.0) {
+      containerColor = Colors.green;
+    } else {
+      containerColor = const Color.fromARGB(255, 6, 82, 144);
+    }
+
+    // Step 3: Return a container with the rounded value displayed
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical:  5),
+      decoration: BoxDecoration(
+        color: containerColor,
+        
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        roundedValue.toString(),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 }

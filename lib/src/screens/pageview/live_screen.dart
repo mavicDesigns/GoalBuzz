@@ -316,7 +316,8 @@ class _LiveMatchesScreenState extends State<LiveMatchesScreen> {
               iconColor: Theme.of(context).textTheme.bodyLarge!.color,
               initiallyExpanded: true,
               dense: true,
-              title: Row(
+              title: 
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(leagueName),

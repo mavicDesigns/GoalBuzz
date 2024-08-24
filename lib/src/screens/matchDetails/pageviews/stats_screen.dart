@@ -243,7 +243,8 @@ class _StatsPageViewState extends State<StatsPageView>  with AutomaticKeepAliveC
     });
 
     return SliverToBoxAdapter(
-      child: Container(
+      child:
+       Container(
         height: 300,
         padding: EdgeInsets.symmetric(vertical: 30, horizontal: 15),
         margin: EdgeInsets.symmetric(vertical: 20, horizontal: 20),

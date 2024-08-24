@@ -15,6 +15,7 @@ import 'package:truck/src/screens/matchDetails/pageviews/head_to_head_screen.dar
 import 'package:truck/src/screens/matchDetails/pageviews/lineup_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/stats_screen.dart';
 import 'package:truck/src/screens/playerDetails/pageview/overviewPage.dart';
+import 'package:truck/src/screens/playerDetails/pageview/statisticsPage.dart';
 
 class PlayerDetailsScreen extends StatefulWidget {
   final int playerId;
@@ -45,11 +46,12 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
   double _textOpacity = 1.0;
   double _imageScale = 1.0;
   double _translateX = 0;
-  double _imageBoxMargin = 90;
-  double _scoreBoxMargin = 60;
+  double _backdropBottom = 10;
   double _scrollOffset = 0;
 
-  final List<String> pageViewNavs = ["Overview", "Lineup", "Stats", "H2H"];
+  Color interpolatedColor = Colors.transparent;
+
+  final List<String> pageViewNavs = ["Overview", "Stats", "Career"];
 
   @override
   void initState() {
@@ -65,14 +67,20 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
     setState(() {
       _scrollOffset = offset;
       _textOpacity = ((maxOffset - offset) / maxOffset).clamp(0.0, 1.0);
-      _imageBoxMargin =
-          ((maxOffset - offset) / maxOffset * 90).clamp(0.0, 90.0);
-      _scoreBoxMargin =
-          ((maxOffset - offset) / maxOffset * 60).clamp(0.0, 60.0);
+      _backdropBottom =
+          ((maxOffset - offset) / maxOffset * 90).clamp(0.0, 10.0);
+
       _imageScale = ((maxOffset - offset) / maxOffset).clamp(0.5, 1.0);
-      _translateX = (initialTranslateX +
-              (offset / maxOffset) * (finalTranslateX - initialTranslateX))
-          .clamp(initialTranslateX, finalTranslateX);
+
+      double factor = (_scrollOffset / maxOffset).clamp(0.0, 1.0);
+
+         Color startColor = Colors.transparent;
+    Color endColor = Theme.of(context).canvasColor;
+
+
+    // Interpolate between the start and end colors
+     interpolatedColor = Color.lerp(startColor, endColor, factor)!;
+
     });
   }
 
@@ -116,7 +124,7 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
       flexibleSpace: Container(
         height: expandedBarHeight,
         decoration: BoxDecoration(
-          color: Theme.of(context).cardTheme.color,
+          color: interpolatedColor,
         ),
         child: playerResponse.responseData.isNotEmpty
             ? Container(
@@ -124,7 +132,7 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
                   alignment: Alignment.center,
                   children: [
                     Positioned(
-                      bottom: 10,
+                      bottom: _backdropBottom,
                       child: Container(
                         decoration: BoxDecoration(
                             color: Theme.of(context).canvasColor,
@@ -139,136 +147,146 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
                             ),
                             Expanded(
                               flex: 3,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  //Club Data
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 10),
-                                    child: Row(
-                                      children: [
-                                        Image.network(
-                                          playerResponse.responseData[0]
-                                              .statistics[0].team!.logo!,
-                                          width: 50,
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            playerResponse
-                                                .responseData[0].player.name!,
-                                            //textAlign: TextAlign.center,
+                              child: Opacity(
+                                opacity: _textOpacity,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    //Club Data
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 10),
+                                      child: Row(
+                                        children: [
+                                          Image.network(
+                                            playerResponse.responseData[0]
+                                                .statistics[0].team!.logo!,
+                                            width: 50,
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              playerResponse
+                                                  .responseData[0].player.name!,
+                                              //textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+
+                                    //Personal Details
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 10),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          //Height Data
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Text(
+                                                playerResponse.responseData[0]
+                                                    .player.height!,
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                'Height',
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall!
+                                                        .color!
+                                                        .withOpacity(.5),
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )
+                                            ],
+                                          ),
+
+                                          //Age Data
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Text(
+                                                playerResponse.responseData[0]
+                                                        .player.age!
+                                                        .toString() +
+                                                    ' Years',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                DateFormat('dd MMM yyyy')
+                                                    .format(playerResponse
+                                                        .responseData[0]
+                                                        .player
+                                                        .birth!
+                                                        .date!),
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall!
+                                                        .color!
+                                                        .withOpacity(.5),
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    //Nationality
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 30,
+                                        vertical: 10,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            'Country:',
                                             style: TextStyle(
-                                                fontSize: 16,
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall!
+                                                    .color!
+                                                    .withOpacity(.5),
+                                                fontSize: 12,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                        )
-                                      ],
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            playerResponse.responseData[0]
+                                                .player.nationality!,
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-
-                                  //Personal Details
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 30, vertical: 10),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        //Height Data
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            Text(
-                                              playerResponse.responseData[0]
-                                                  .player.height!,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              'Height',
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall!
-                                                      .color!
-                                                      .withOpacity(.5),
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold),
-                                            )
-                                          ],
-                                        ),
-
-                                        //Age Data
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            Text(
-                                              playerResponse.responseData[0]
-                                                      .player.age!
-                                                      .toString() +
-                                                  ' Years',
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              DateFormat('dd MMM yyyy').format(
-                                                  playerResponse.responseData[0]
-                                                      .player.birth!.date!),
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall!
-                                                      .color!
-                                                      .withOpacity(.5),
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  //Nationality
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 30,
-                                      vertical: 10,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          'Country:',
-                                          style: TextStyle(
-                                              color: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall!
-                                                  .color!
-                                                  .withOpacity(.5),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          playerResponse.responseData[0].player
-                                              .nationality!,
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ],
@@ -280,12 +298,18 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
                     Positioned(
                         bottom: 70,
                         left: 23,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(30),
-                          child: Container(
-                            child: Image.network(
-                              playerResponse.responseData[0].player.photo!,
-                              width: 150,
+                        child: Opacity(
+                          opacity: _textOpacity,
+                          child: Transform.scale(
+                            scale: _imageScale,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(30),
+                              child: Container(
+                                child: Image.network(
+                                  playerResponse.responseData[0].player.photo!,
+                                  width: 150,
+                                ),
+                              ),
                             ),
                           ),
                         )),
@@ -359,18 +383,13 @@ class _PlayerDetailsScreenState extends State<PlayerDetailsScreen>
                   ];
                 },
                 body: TabBarView(controller: _tabController, children: [
-                  SingleChildScrollView(
-                    child: OverViewPage(
-                      playerResponse: state.response,
-                    ),
-                  ),
                   OverViewPage(
                     playerResponse: state.response,
-                  ),OverViewPage(
-                    playerResponse: state.response,
-                  ),OverViewPage(
+                  ),
+                  StatsViewPage(
                     playerResponse: state.response,
                   ),
+                  Container()
                 ]),
               );
             } else if (state is PlayerError) {
