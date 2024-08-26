@@ -37,6 +37,7 @@ class _HeadToHeadPageViewState extends State<HeadToHeadPageView>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: BlocBuilder<FixturesBloc, FixturesState>(
           bloc: _fixturesBloc,

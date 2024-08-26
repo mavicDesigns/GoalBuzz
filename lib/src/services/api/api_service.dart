@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:truck/src/models/api_response_model.dart';
 import 'package:truck/src/models/players_model.dart';
+import 'package:truck/src/models/standings_response_model.dart';
+import 'package:truck/src/models/team_response_model.dart';
 
 const String baseUrl =
     'http://localhost:8080'; // Replace with your API base URL
@@ -109,6 +111,58 @@ Future<PlayerResponse> fetchPlayer(int playerId) async {
 
 
     final PlayerResponse data = PlayerResponse.fromJson(responseBody);
+   
+    return data;
+  } else {
+    print(response.statusCode);
+    throw Exception('Failed to load matches');
+  }
+}
+
+
+
+Future<TeamDetailsResponse> fetchTeamDeatials(int teamId) async {
+  final response = await http.get(
+    Uri.parse('$baseUrl/teams?id=$teamId'),
+    headers: {
+      'x-apisports-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+
+    final Map<String, dynamic> responseBody = jsonDecode(response.body);
+    // Use ApiResponse.fromJson to parse the Map
+
+
+    final TeamDetailsResponse data = TeamDetailsResponse.fromJson(responseBody);
+   
+    return data;
+  } else {
+    print(response.statusCode);
+    throw Exception('Failed to load matches');
+  }
+}
+
+
+
+Future<StandingsResponse> fetchStandings(int? teamId) async {
+  final response = await http.get(
+    Uri.parse('$baseUrl/teams?id=$teamId'),
+    headers: {
+      'x-apisports-key': apiKey,
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+
+    final Map<String, dynamic> responseBody = jsonDecode(response.body);
+    // Use ApiResponse.fromJson to parse the Map
+
+
+    final StandingsResponse data = StandingsResponse.fromJson(responseBody);
    
     return data;
   } else {

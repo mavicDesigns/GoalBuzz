@@ -10,12 +10,12 @@ import 'package:truck/src/screens/matchDetails/pageviews/details_page_screen.dar
 import 'package:truck/src/screens/matchDetails/pageviews/head_to_head_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/lineup_screen.dart';
 import 'package:truck/src/screens/matchDetails/pageviews/stats_screen.dart';
+import 'package:truck/src/screens/teamDetails/team_details_screen.dart';
 
 class MatchDetailsScreen extends StatefulWidget {
   final Data response;
 
-  const MatchDetailsScreen({Key? key, required this.response})
-      : super(key: key);
+  const MatchDetailsScreen({super.key, required this.response});
 
   @override
   _MatchDetailsScreenState createState() => _MatchDetailsScreenState();
@@ -27,7 +27,6 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
 
   late Timer? _timer;
   late Duration _duration;
-  bool _showCountdown = true;
 
   late ScrollController _scrollController;
   late TabController _tabController;
@@ -67,7 +66,6 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
     if (_duration.isNegative) {
       _timer!.cancel();
       setState(() {
-        _showCountdown = false;
       });
     }
   }
@@ -92,8 +90,8 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
   void dispose() {
     _scrollController.dispose();
     if (_timer != null) {
-  _timer!.cancel();
-}
+      _timer!.cancel();
+    }
 
     _tabController.dispose();
     super.dispose();
@@ -171,6 +169,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
               _buildTeamColumn(
                   widget.response.teams!.home['logo'],
                   widget.response.teams!.home['name'],
+                  widget.response.teams!.home['id'],
                   _translateX,
                   _imageBoxMargin,
                   Alignment.centerRight),
@@ -180,6 +179,7 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
               _buildTeamColumn(
                   widget.response.teams!.away['logo'],
                   widget.response.teams!.away['name'],
+                  widget.response.teams!.away['id'],
                   -_translateX,
                   _imageBoxMargin,
                   Alignment.centerLeft),
@@ -190,35 +190,47 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
     );
   }
 
-  Widget _buildTeamColumn(String imagePath, String teamName, double translateX,
-      double margin, Alignment alignment) {
+  Widget _buildTeamColumn(String imagePath, String teamName, int teamID,
+      double translateX, double margin, Alignment alignment) {
     return Expanded(
       flex: 2,
-      child: Transform.translate(
-        offset: Offset(translateX, 0),
-        child: Transform.scale(
-          scale: _imageScale,
-          child: Align(
-            alignment: alignment,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: margin),
-                Image.network(imagePath, width: 75),
-                SizedBox(height: 10),
-                Opacity(
-                  opacity: _textOpacity,
-                  child: Text(
-                    teamName,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).textTheme.displayLarge!.color,
+      child: GestureDetector(
+         onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeamDetailsScreen(
+              teamId: teamID,
+            ),
+          ),
+        );
+      },
+        child: Transform.translate(
+          offset: Offset(translateX, 0),
+          child: Transform.scale(
+            scale: _imageScale,
+            child: Align(
+              alignment: alignment,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: margin),
+                  Image.network(imagePath, width: 75),
+                  SizedBox(height: 10),
+                  Opacity(
+                    opacity: _textOpacity,
+                    child: Text(
+                      teamName,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.displayLarge!.color,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -233,7 +245,6 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
           _duration = _duration - Duration(seconds: 1);
         } else {
           _timer?.cancel();
-          _showCountdown = false;
         }
       });
     });
@@ -280,7 +291,6 @@ class _MatchDetailsScreenState extends State<MatchDetailsScreen>
   }
 
   Widget _buildScoreColumn() {
-    final Score? score = widget.response.score;
     final TeamsClass goals = widget.response.goals!;
     final Fixture? fixture = widget.response.fixture;
 

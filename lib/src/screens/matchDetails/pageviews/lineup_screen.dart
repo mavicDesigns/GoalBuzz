@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:truck/src/bloc/fixtures/fixtures.bloc.dart';
 import 'package:truck/src/bloc/fixtures/fixtures_events.dart';
-import 'package:truck/src/components/widget/custom_button.dart';
 import 'package:truck/src/models/api_response_model.dart';
 import 'package:truck/src/screens/playerDetails/player_details_screen.dart';
 import 'package:truck/src/themes/light_theme.dart';
@@ -24,8 +22,6 @@ class _LineUpPageViewState extends State<LineUpPageView>
 
   int _lineUpIndex = 0;
 
-  late Lineup _currentLineup;
-  late Data _responseData;
 
   late TabController _tabController;
 
@@ -35,7 +31,6 @@ class _LineUpPageViewState extends State<LineUpPageView>
     super.initState();
     _fixturesBloc = FixturesBloc();
     _tabController = TabController(vsync: this, length: 2);
-    _responseData = widget.response;
 
     _fixturesBloc.add(FetchFixture(widget.response.fixture!.id!));
   }
@@ -49,6 +44,7 @@ class _LineUpPageViewState extends State<LineUpPageView>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: BlocBuilder<FixturesBloc, FixturesState>(
           bloc: _fixturesBloc,
@@ -57,8 +53,6 @@ class _LineUpPageViewState extends State<LineUpPageView>
               return Center(child: CircularProgressIndicator());
             } else if (state is FixturesLoaded) {
               if(state.response.data[0].lineups!.isNotEmpty) {
-_responseData = state.response.data[0];
-              _currentLineup = _responseData.lineups![0];
               return CustomScrollView(
                 slivers: [
                   _buildLineUp(state.response.data[0].lineups!),

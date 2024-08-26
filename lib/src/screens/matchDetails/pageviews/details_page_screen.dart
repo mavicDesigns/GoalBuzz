@@ -40,7 +40,6 @@ class _DetailsPageViewState extends State<DetailsPageView>  with AutomaticKeepAl
             if (state is FixturesLoading) {
               return Center(child: CircularProgressIndicator());
             } else if (state is FixturesLoaded) {
-              final fixture = state.response;
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 50),
                 child: Column(
